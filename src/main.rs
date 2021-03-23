@@ -21,13 +21,17 @@ use walkdir::WalkDir;
 
 use anyhow::format_err;
 use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
+use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
+
 
 fn main() {
+    let model_name = "suzanne_283";
     let mut writer =
-        BufWriter::new(File::create("output.yml").expect("Failed to open output file"));
+        BufWriter::new(File::create(model_name.to_owned() + ".yml").expect("Failed to open output file"));
 
     // for file in WalkDir::new(r".")
-    for file in WalkDir::new(r"C:\Projects\FBX_Import_Testing\Assets\testcube.fbx")
+    // for file in WalkDir::new(r"C:\Projects\FBX_Import_Testing\Assets\".to_owned() + model_name + ".fbx")
+    for file in WalkDir::new(r"C:\Projects\Clockwork\CloningMain\Assets\Game\Environment\Kitchenette\Bowl\Bowl.fbx")
         .follow_links(true)
         .into_iter()
         .filter_map(|e| e.ok())
@@ -54,9 +58,17 @@ fn check_fbx_file(path: &PathBuf, writer: &mut BufWriter<File>) -> Result<(), an
 
     match AnyDocument::from_seekable_reader(reader)? {
         AnyDocument::V7400(fbx_ver, doc) => {
+            print_children(writer, &doc.tree().root(), 0);
             let mut errors = vec![];
-            errors.extend(verify_roots_have_identity_transform(&doc));
-            errors.extend(verify_blender_exports_have_correct_axis(&doc)?);
+
+            errors.extend(verify_roots_have_identity_transform(&doc)?);
+            errors.extend(verify_units_are_in_meters(&doc));
+
+            // This check is currently disabled. If you're on a version of Blender <2.9?, you
+            // will have to use the coordinate system in the FBX file to automatically 'counter-rotate'
+            // the meshes, (to avoid applying a root rotation to the file).
+            // errors.extend(verify_blender_exports_have_correct_axis(&doc)?);
+
             for e in errors {
                 println!("{}", e);
             }
@@ -68,14 +80,14 @@ fn check_fbx_file(path: &PathBuf, writer: &mut BufWriter<File>) -> Result<(), an
     return Ok(());
 }
 
-fn verify_roots_have_identity_transform(doc: &Document) -> Vec<String> {
+fn verify_roots_have_identity_transform(doc: &Document) -> anyhow::Result<Vec<String>> {
     let mut errors = vec![];
 
     for root in get_model_roots(&doc) {
         let name = root.name().unwrap_or("(object has no name)");
 
         // No rotation implies a zero rotation.
-        if let Some(rot) = root.local_rotation() {
+        if let Some(rot) = root.local_rotation()? {
             let r: cgmath::Vector3<f64> = rot.into();
             if !r.eq(&cgmath::Vector3::<f64>::zero()) {
                 errors.push(format!(
@@ -86,7 +98,7 @@ fn verify_roots_have_identity_transform(doc: &Document) -> Vec<String> {
         }
 
         // No scale implies a scale of 1
-        if let Some(scl) = root.local_scale() {
+        if let Some(scl) = root.local_scale()? {
             let s: cgmath::Vector3<f64> = scl.into();
             if !s.eq(&cgmath::Vector3::<f64>::zero()) {
                 errors.push(format!(
@@ -97,10 +109,45 @@ fn verify_roots_have_identity_transform(doc: &Document) -> Vec<String> {
         }
     }
 
-    return errors;
+    return Ok(errors);
 }
 
-// fn verify_units_are_in_meters(doc: &Document) -> Result<Vec<String>, anyhow::Error> {}
+fn verify_units_are_in_meters(doc: &Document) -> Option<String> {
+    let settings = match doc.global_settings() {
+        Some(s) => s,
+        None => return Some("File has no units. (No GlobalSettings)".into()),
+    };
+
+    let scale_factor_prop = match settings.get_property("UnitScaleFactor"){
+        None => return Some("File has no units. (No UnitScaleFactor)".into()),
+        Some(p) => p
+    };
+
+    let scale_factor_value = match scale_factor_prop.value_part().get(0) {
+        None => return Some("File has no units. (No Unit Value)".into()),
+        Some(v) => v,
+    };
+
+    if let AttributeValue::F64(scale_factor) = scale_factor_value {
+        if *scale_factor != 100.0f64 {
+            return Some(format!("File is not in meter units. Units: {}cm. Should be 100.0cm.", *scale_factor))
+        }
+    }
+
+    return None;
+}
+
+// fn verify_bounding_box_size(doc: &Document) -> Option<String> {
+//     for obj in doc.objects() {
+//         if let TypedObjectHandle::Geometry(geo) = obj.get_typed() {
+//             if let TypedGeometryHandle::Mesh(m) = geo {
+//                 // m.polygon_vertices()
+//             }
+//         }
+//     }
+//
+//     return None;
+// }
 
 fn verify_blender_exports_have_correct_axis(doc: &Document) -> Result<Vec<String>, anyhow::Error> {
     let node = doc
@@ -116,9 +163,9 @@ fn verify_blender_exports_have_correct_axis(doc: &Document) -> Result<Vec<String
             let axis = get_coordinate_axis(doc).ok_or(format_err!("Could not find coordinate axis."))?;
 
             let correct = CoordinateAxis {
-                up: [0f64, 0f64, 1f64].into(),
-                front: [0f64, 1f64, 0f64].into(),
-                coord: [-1f64, 0f64, 0f64].into(),
+                up: [0, 0, 1].into(),
+                front: [0, 1, 0].into(),
+                coord: [-1, 0, 0].into(),
             };
 
             if axis != correct {
@@ -133,9 +180,9 @@ fn verify_blender_exports_have_correct_axis(doc: &Document) -> Result<Vec<String
 
 #[derive(Debug, PartialEq)]
 struct CoordinateAxis {
-    up: Vector3<f64>,
-    front: Vector3<f64>,
-    coord: Vector3<f64>,
+    up: Vector3<bool>,
+    front: Vector3<bool>,
+    coord: Vector3<bool>,
 }
 
 fn get_coordinate_axis(doc: &Document) -> Option<CoordinateAxis> {
