@@ -23,7 +23,9 @@ use walkdir::WalkDir;
 
 mod bounding_box_size;
 mod mesh_naming;
+mod meshes_have_normals;
 mod root_has_identity_transform;
+mod utils;
 
 fn main() {
     // Custom logging formatting: "[ERROR] Error text."
@@ -77,6 +79,7 @@ fn check_fbx_file(path: &PathBuf, writer: &mut BufWriter<File>) -> Result<(), an
             errors.extend(root_has_identity_transform::verify(&doc)?);
             errors.extend(bounding_box_size::verify(&doc)?);
             errors.extend(mesh_naming::verify(&doc)?);
+            errors.extend(meshes_have_normals::verify(&doc)?);
 
             // This check is currently disabled. If you're on a version of Blender <2.9?, you
             // will have to use the coordinate system in the FBX file to automatically 'counter-rotate'
