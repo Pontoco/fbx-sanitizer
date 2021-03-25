@@ -11,6 +11,12 @@ fbxcel-dom = "0.0.6"
 anyhow = "1.0.38"
 walkdir = "2.3.1"
 mint = "0.5.6"
+ordered-float = "2.0"
+itertools = "0.10.0"
+log = "0.4.14"
+env_logger = "0.8.3"
+regex = "1.4.5"
+lazy_static = "1.4.0"
 
 [dependencies.cgmath]
 version = "0.18.0"
