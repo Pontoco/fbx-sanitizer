@@ -1,0 +1,3 @@
+[submodule "fbxcel-dom"]
+	path = fbxcel-dom
+	url = https://github.com/Kleptine/fbxcel-dom
