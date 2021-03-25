@@ -10,6 +10,9 @@ lazy_static! {
     static ref CYLINDER2: Regex = Regex::new(r"^Cylinder$").unwrap();
 }
 
+/// Checks for lazy mesh names like "Cube.124" and "cylinder16". They make it incredibly difficult
+/// to find objects in the hierarchy.
+/// Note: This should probably not be a strict check, and might be disabled. It's not a blocking issue.
 pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
     let mut errors: Vec<String> = vec![];
     for o in doc.objects() {

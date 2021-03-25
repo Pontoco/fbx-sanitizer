@@ -2,7 +2,9 @@ use crate::utils::get_model_roots;
 use cgmath::Zero;
 use fbxcel_dom::v7400::Document;
 
-/// Verifies that files with a single root have identity rotation and scale.
+/// Verifies that files with a single root have identity rotation and scale. Having 90 degree rotations
+/// on all objects makes it very hard to use them in gameplay scripting.
+///
 /// Files with multiple roots will be imported with an empty parent in Unity. In those cases
 /// non-identity transforms are ok.
 pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {

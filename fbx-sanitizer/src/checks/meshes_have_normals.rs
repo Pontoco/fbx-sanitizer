@@ -4,6 +4,9 @@ use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
 use fbxcel_dom::v7400::object::TypedObjectHandle;
 use fbxcel_dom::v7400::Document;
 
+/// Checks to make sure the object has normals. If it does not, Unity will generate its own normals
+/// based on the angle of each edge. Usually this is a terrible way to generate normals. Normals
+/// should be generated in the modeling program before export.
 pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
     let mut errors = vec![];
 

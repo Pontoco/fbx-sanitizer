@@ -6,6 +6,11 @@ use fbxcel_dom::v7400::Document;
 use std::collections::HashSet;
 use std::iter::FromIterator;
 
+/// Checks for meshes that contain quads or polygons larger than 3 edges. These will be automatically
+/// triangulated by Unity on import, but not necessarily the same way your 3D modeling or painting
+/// program will do it. This can lead to texture warping when applying the texture in Unity.
+///
+/// All models should be triangulated before being imported into Substance or Unity.
 pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
     let mut errors = vec![];
 

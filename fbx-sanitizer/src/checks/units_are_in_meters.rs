@@ -1,6 +1,8 @@
 use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::v7400::Document;
 
+/// If units are not in meters, Unity will apply a scale when loading.
+/// If units are not set at all, generates an error because some software will assume CM (Blender) kwhile others will not (Unity).
 pub fn verify(doc: &Document) -> Vec<String> {
     const METERS_SCALE: f64 = 100.0f64;
 

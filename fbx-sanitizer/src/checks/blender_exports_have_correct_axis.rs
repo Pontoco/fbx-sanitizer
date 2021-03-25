@@ -4,6 +4,8 @@ use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::v7400::object::property::PropertiesHandle;
 use fbxcel_dom::v7400::Document;
 
+/// In Blender 2.90, it is possible to export a file with the correct rotation, without changing the
+/// axis. This guarantees that the object will not accidentally be counter-rotated when importing into Unity.
 #[allow(unused)]
 pub fn verify(doc: &Document) -> Result<Vec<String>, anyhow::Error> {
     let node = doc

@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::Read;
 use std::path::PathBuf;
 
+/// Blender cannot load the FBX ASCII format. Reject files if they are not in the binary format.
 pub fn verify(path: &PathBuf) -> anyhow::Result<bool> {
     let mut bytes = Vec::<u8>::new();
     File::open(path)?.read_to_end(&mut bytes)?;
