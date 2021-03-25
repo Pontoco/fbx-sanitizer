@@ -17,6 +17,9 @@ log = "0.4.14"
 env_logger = "0.8.3"
 regex = "1.4.5"
 lazy_static = "1.4.0"
+clap = "2.33.0"
+content_inspector = "0.2.4"
+indexmap = "1.6.2"
 
 [dependencies.cgmath]
 version = "0.18.0"

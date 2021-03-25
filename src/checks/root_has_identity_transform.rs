@@ -1,4 +1,4 @@
-use crate::get_model_roots;
+use crate::utils::get_model_roots;
 use cgmath::Zero;
 use fbxcel_dom::v7400::Document;
 
