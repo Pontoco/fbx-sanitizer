@@ -38,6 +38,7 @@ fn main() {
         .arg(Arg::with_name("summary").long("summary").takes_value(false).help(
             "Outputs a one-line summary for each fbx file passed in, rather than all errors.",
         ))
+        .arg(Arg::with_name("files").multiple(true).takes_value(true).help("A set of fbx files to analyze.").required(true))
         .get_matches();
 
     // let fbx_file = Path::new(
@@ -50,20 +51,36 @@ fn main() {
     //
     // let mut writer = BufWriter::new(File::create(yml_output).expect("Failed to open output file"));
 
-    let fbx_file = Path::new(r"C:\Projects\Clockwork\CloningMain\Assets");
+    // let fbx_file = Path::new(r"C:\Projects\Clockwork\CloningMain\Assets");
+
+    // let directory_files = WalkDir::new(files)
+    //     .follow_links(true)
+    //     .into_iter()
+    //     .filter_map(|e| e.ok());
+
+    let files: Vec<&Path> = cli_matches
+        .values_of("files")
+        .unwrap()
+        .map(|f| Path::new(f))
+        .collect();
 
     if cli_matches.is_present("summary") {}
 
-    for file in WalkDir::new(fbx_file)
-        .follow_links(true)
-        .into_iter()
-        .filter_map(|e| e.ok())
-    {
-        let f_name = file.file_name().to_string_lossy().clone();
-        let path = file.clone().into_path();
+    for path in files {
+        let f_name_opt = path.file_name();
+
+        let f_name = match f_name_opt {
+            None => {
+                log::error!("File path was not a valid fbx: {}", path.display());
+                continue;
+            }
+            Some(f) => f,
+        };
+
+        let f_name = f_name.to_string_lossy().clone();
 
         if f_name.ends_with(".fbx") {
-            let result = check_fbx_file(&path, &cli_matches);
+            let result = check_fbx_file(&path.to_path_buf(), &cli_matches);
             if let Err(e) = result {
                 log::warn!("Could not parse fbx: {:?}", path);
                 log::warn!("{:?}", e);
