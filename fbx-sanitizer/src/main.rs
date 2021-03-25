@@ -129,19 +129,19 @@ fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<(), anyhow:
     }
 
     // Print output
+    let total_errors: usize = errors.iter().map(|(_, errors)| errors.len()).sum();
     if args.is_present("summary") {
         let issues = errors
             .iter()
             .filter(|(issue, errors)| errors.len() > 0)
             .map(|(issue, errors)| issue)
             .join(",");
-        let total_errors: usize = errors.iter().map(|(_, errors)| errors.len()).sum();
         if total_errors > 0 {
             log::error!("{},{},{}", path.display(), total_errors, issues);
         }
     } else {
-        if errors.len() > 0 {
-            log::error!("The file {} has {} errors:", path.display(), errors.len());
+        if total_errors > 0 {
+            log::error!("The file {} has {} errors:", path.display(), total_errors);
             for (issue, errors) in errors {
                 for error in errors {
                     log::error!("{} - {}", issue, error);
