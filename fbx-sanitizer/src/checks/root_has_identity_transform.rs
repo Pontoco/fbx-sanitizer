@@ -1,5 +1,5 @@
-use crate::utils::get_model_roots;
-use cgmath::Zero;
+use crate::utils::{get_creator, get_model_roots};
+use cgmath::{AbsDiffEq, Zero};
 use fbxcel_dom::v7400::Document;
 
 /// Verifies that files with a single root have identity rotation and scale. Having 90 degree rotations
@@ -45,7 +45,12 @@ pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
         // No scale implies a scale of 1
         if let Some(scl) = root.local_scaling()? {
             let s: cgmath::Vector3<f64> = scl.into();
-            if !s.eq(&cgmath::Vector3::<f64>::new(1f64, 1f64, 1f64)) {
+
+            // Some tools will output a global scale of ~1, even if it's unnecessary.
+            if s.abs_diff_ne(
+                &cgmath::Vector3::<f64>::new(1f64, 1f64, 1f64),
+                0.00000001f64,
+            ) {
                 errors.push(format!(
                     "The root object [{}] does not have a scale of 1. It has scale: [{:?}]",
                     name, s
