@@ -1,6 +1,8 @@
+use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::fbxcel::tree::v7400::NodeHandle;
 use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
 use fbxcel_dom::v7400::object::model::TypedModelHandle;
+use fbxcel_dom::v7400::object::property::{PropertiesHandle, PropertiesNodeId};
 use fbxcel_dom::v7400::object::{ObjectId, TypedObjectHandle};
 use fbxcel_dom::v7400::Document;
 use std::collections::HashMap;
@@ -79,4 +81,17 @@ pub fn print_children(
     }
 
     Ok(())
+}
+
+/// Returns the Creator string from the document root, if it exists.
+/// Usually the FBX SDK (Maya, Max) or Blender
+pub fn get_creator(doc: &Document) -> Option<&str> {
+    let node = doc.tree().root().children_by_name("Creator").next()?;
+
+    let creator = &node.attributes()[0];
+    if let AttributeValue::String(c) = creator {
+        return Some(c);
+    }
+
+    None
 }

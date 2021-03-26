@@ -65,7 +65,7 @@ fn main() {
         .map(|f| Path::new(f))
         .collect();
 
-    if cli_matches.is_present("summary") {}
+    let mut any_errs = false;
 
     for path in files {
         let f_name_opt = path.file_name();
@@ -85,15 +85,26 @@ fn main() {
 
             if cli_matches.is_present("dump-structure") {}
 
-            if let Err(e) = result {
-                log::warn!("Could not parse fbx: {:?}", path);
-                log::warn!("{:?}", e);
+            match result {
+                Err(e) => {
+                    log::warn!("Could not parse fbx: {:?}", path);
+                    log::warn!("{:?}", e);
+                }
+                Ok(success) => {
+                    any_errs |= !success;
+                }
             }
         }
     }
+
+    if any_errs {
+        std::process::exit(1);
+    }
 }
 
-fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<(), anyhow::Error> {
+/// Runs checks on the fbx file at the specified path.
+/// Returns true if there were no errors.
+fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, anyhow::Error> {
     // println!("Parsing file: {}", path.display());
     let file = File::open(path).expect("Failed to open file.");
 
@@ -127,10 +138,13 @@ fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<(), anyhow:
                 }
 
                 // Apply each error checker.
-                errors
-                    .entry("Units not in meters")
-                    .or_insert(vec![])
-                    .extend(units_are_in_meters::verify(&doc));
+
+                // Disabled for now. Maya has to output file that are not in Meters, in order to
+                // import into Unity without a scale.
+                // errors
+                //     .entry("Units not in meters")
+                //     .or_insert(vec![])
+                //     .extend(units_are_in_meters::verify(&doc));
                 errors
                     .entry("Incorrect axis")
                     .or_insert(vec![])
@@ -181,13 +195,14 @@ fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<(), anyhow:
     } else {
         if total_errors > 0 {
             log::error!("The file {} has {} errors:", path.display(), total_errors);
-            for (issue, errors) in errors {
+            for (_issue, errors) in errors {
                 for error in errors {
-                    log::error!("{} - {}", issue, error);
+                    log::error!("{}", error);
                 }
             }
+            println!();
         }
     }
 
-    Ok(())
+    Ok(total_errors == 0)
 }
