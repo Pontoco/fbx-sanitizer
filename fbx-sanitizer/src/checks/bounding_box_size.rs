@@ -57,10 +57,11 @@ pub fn verify(doc: &Document) -> anyhow::Result<Option<String>> {
                         min,
                     )?;
 
+                // Check fails if *all* of the bounds are smaller than the min.
                 let bounds: Vector3<NotNan<f64>> = max_bound - min_bound;
                 if *bounds.x < MIN_BOUND_SIZE
-                    || *bounds.y < MIN_BOUND_SIZE
-                    || *bounds.z < MIN_BOUND_SIZE
+                    && *bounds.y < MIN_BOUND_SIZE
+                    && *bounds.z < MIN_BOUND_SIZE
                 {
                     return Ok(Some(format!(
                         "The bounds (size) of the mesh [{}] are too small. Meshes must be larger than [{}]. The mesh \
@@ -70,6 +71,8 @@ pub fn verify(doc: &Document) -> anyhow::Result<Option<String>> {
                         vec_to_string(bounds)
                     )));
                 }
+
+                // Check fails if *any* of the bounds are larger than the max.
                 if *bounds.x > MAX_BOUND_SIZE
                     || *bounds.y > MAX_BOUND_SIZE
                     || *bounds.z > MAX_BOUND_SIZE
