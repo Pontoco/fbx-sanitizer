@@ -4,8 +4,16 @@ use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::v7400::object::property::PropertiesHandle;
 use fbxcel_dom::v7400::Document;
 
-/// In Blender 2.90, it is possible to export a file with the correct rotation, without changing the
-/// axis. This guarantees that the object will not accidentally be counter-rotated when importing into Unity.
+/// Files should have the same axis settings as Unity. ie.
+///   Front: +Z
+///   Up: +Y
+///   Right: +X
+///
+/// Note: Front is distinct from "forward" which is the negative of front. Blender uses the 'forward'
+/// wording.
+///
+/// This check could be removed in favor of `blender_exports_have_correct_axis` when Unity fixes this bug
+/// https://forum.unity.com/threads/bake-axis-conversion-import-setting.899072/#post-6975023
 #[allow(unused)]
 pub fn verify(doc: &Document) -> Result<Vec<String>, anyhow::Error> {
     let node = doc
