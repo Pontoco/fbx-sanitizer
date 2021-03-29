@@ -1,3 +1,5 @@
+use anyhow::format_err;
+use clap::App;
 use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::fbxcel::tree::v7400::NodeHandle;
 use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
@@ -6,6 +8,8 @@ use fbxcel_dom::v7400::object::property::{PropertiesHandle, PropertiesNodeId};
 use fbxcel_dom::v7400::object::{ObjectId, TypedObjectHandle};
 use fbxcel_dom::v7400::Document;
 use std::collections::HashMap;
+use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;
@@ -94,4 +98,39 @@ pub fn get_creator(doc: &Document) -> Option<&str> {
     }
 
     None
+}
+
+/// Returns the FBXHeaderExtension->SceneInfo->LastSaved|ApplicationName property, which is the
+/// name of the program that last saved the fbx file.
+/// 
+/// Returns None if there is no application name provided in the file.
+pub fn get_application_name(doc: &Document) -> Option<ApplicationName> {
+    let name = match doc.scene_info()?.get_property("LastSaved|ApplicationName") {
+        None => return None,
+        Some(p) => {
+            if let AttributeValue::String(s) = p.value_part().get(0)? {
+                s
+            } else {
+                return None;
+            }
+        }
+    };
+
+    if name.contains("Blender") {
+        Some(ApplicationName::Blender)
+    } else if name.contains("Maya") {
+        Some(ApplicationName::Maya)
+    } else if name.contains("3ds Max") {
+        Some(ApplicationName::Max)
+    } else {
+        Some(ApplicationName::UnknownApplication(name))
+    }
+}
+
+#[derive(Debug)]
+pub enum ApplicationName<'a> {
+    Blender, // blender
+    Max,     // 3ds max
+    Maya,    // maya
+    UnknownApplication(&'a str),
 }

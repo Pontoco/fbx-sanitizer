@@ -70,9 +70,10 @@ fn main() {
     for path in files {
         let f_name_opt = path.file_name();
 
+        // File paths must have a sensible filename and extension
         let f_name = match f_name_opt {
             None => {
-                log::error!("File path was not a valid fbx: {}", path.display());
+                log::error!("File path was not a valid file path: {}", path.display());
                 continue;
             }
             Some(f) => f,
@@ -87,8 +88,9 @@ fn main() {
 
             match result {
                 Err(e) => {
-                    log::warn!("Could not parse fbx: {:?}", path);
-                    log::warn!("{:?}", e);
+                    log::error!("Could not parse fbx: {:?}", path);
+                    log::error!("{:?}", e);
+                    any_errs |= true;
                 }
                 Ok(success) => {
                     any_errs |= !success;
@@ -104,9 +106,9 @@ fn main() {
 
 /// Runs checks on the fbx file at the specified path.
 /// Returns true if there were no errors.
-fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, anyhow::Error> {
+pub fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, anyhow::Error> {
     // println!("Parsing file: {}", path.display());
-    let file = File::open(path).expect("Failed to open file.");
+    let file = File::open(path)?;
 
     // You can also use raw `file`, but do buffering for better efficiency.
     let reader = BufReader::new(file);
@@ -141,10 +143,10 @@ fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, anyho
 
                 // Disabled for now. Maya has to output file that are not in Meters, in order to
                 // import into Unity without a scale.
-                // errors
-                //     .entry("Units not in meters")
-                //     .or_insert(vec![])
-                //     .extend(units_are_in_meters::verify(&doc));
+                errors
+                    .entry("Units not in meters")
+                    .or_insert(vec![])
+                    .extend(units_are_in_meters::verify(&doc));
                 errors
                     .entry("Incorrect axis")
                     .or_insert(vec![])
