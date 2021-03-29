@@ -4,6 +4,7 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 // Invalid mesh names:
+#[allow(clippy::trivial_regex)]
 lazy_static! {
     static ref CUBE: Regex = Regex::new(r"^Cube\.\d+$").unwrap();
     static ref CYLINDER: Regex = Regex::new(r"^cylinder\d+$").unwrap();
@@ -13,6 +14,7 @@ lazy_static! {
 /// Checks for lazy mesh names like "Cube.124" and "cylinder16". They make it incredibly difficult
 /// to find objects in the hierarchy.
 /// Note: This should probably not be a strict check, and might be disabled. It's not a blocking issue.
+#[allow(dead_code)]
 pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
     let mut errors: Vec<String> = vec![];
     for o in doc.objects() {
@@ -30,5 +32,5 @@ pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
         }
     }
 
-    return Ok(errors);
+    Ok(errors)
 }

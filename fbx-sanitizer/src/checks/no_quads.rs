@@ -4,7 +4,6 @@ use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
 use fbxcel_dom::v7400::object::TypedObjectHandle;
 use fbxcel_dom::v7400::Document;
 use std::collections::HashSet;
-use std::iter::FromIterator;
 
 /// Checks for meshes that contain quads or polygons larger than 3 edges. These will be automatically
 /// triangulated by Unity on import, but not necessarily the same way your 3D modeling or painting
@@ -46,7 +45,7 @@ pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
                     poly_start_index = next_start_index;
                 }
 
-                if poly_sizes.len() > 0 {
+                if !poly_sizes.is_empty() {
                     let name = geo_name(&geo).unwrap_or("No Name");
                     let just_quads = [4].iter().cloned().collect();
                     if poly_sizes == just_quads {

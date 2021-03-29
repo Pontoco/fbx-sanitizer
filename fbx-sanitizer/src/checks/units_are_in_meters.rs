@@ -1,9 +1,9 @@
 use crate::utils::{get_application_name, ApplicationName};
-use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::v7400::Document;
 
 /// If units are not in meters, Unity will apply a scale when loading.
 /// If units are not set at all, generates an error because some software will assume CM (Blender) kwhile others will not (Unity).
+#[allow(clippy::float_cmp)]
 pub fn verify(doc: &Document) -> Vec<String> {
     let correct_unit: f64 = match get_application_name(doc) {
         Some(ApplicationName::Maya) => 1f64, // Maya cannot export in meters properly. This is the cm 'hack'

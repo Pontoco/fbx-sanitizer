@@ -1,16 +1,10 @@
 use clap::Arg;
 use fbxcel_dom::any::AnyDocument;
-use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
-use fbxcel_dom::v7400::object::model::TypedModelHandle;
-use fbxcel_dom::v7400::object::{ObjectId, TypedObjectHandle};
-use fbxcel_dom::v7400::Document;
 use indexmap::IndexMap;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::io::{BufReader, BufWriter};
 use std::path::{Path, PathBuf};
-use walkdir::WalkDir;
 
 mod checks;
 mod utils;
@@ -19,7 +13,6 @@ use crate::utils::print_children;
 use checks::bounding_box_size;
 use checks::correct_coordinate_axis;
 use checks::is_fbx_binary;
-use checks::mesh_naming;
 use checks::meshes_have_normals;
 use checks::no_quads;
 use checks::root_has_identity_transform;
@@ -188,22 +181,20 @@ pub fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, a
     if args.is_present("summary") {
         let issues = errors
             .iter()
-            .filter(|(issue, errors)| errors.len() > 0)
-            .map(|(issue, errors)| issue)
+            .filter(|(_issue, errors)| !errors.is_empty())
+            .map(|(issue, _errors)| issue)
             .join(",");
         if total_errors > 0 {
             log::error!("{},{},{}", path.display(), total_errors, issues);
         }
-    } else {
-        if total_errors > 0 {
-            log::error!("The file {} has {} errors:", path.display(), total_errors);
-            for (_issue, errors) in errors {
-                for error in errors {
-                    log::error!("{}", error);
-                }
+    } else if total_errors > 0 {
+        log::error!("The file {} has {} errors:", path.display(), total_errors);
+        for (_issue, errors) in errors {
+            for error in errors {
+                log::error!("{}", error);
             }
-            println!();
         }
+        println!();
     }
 
     Ok(total_errors == 0)

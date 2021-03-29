@@ -1,13 +1,10 @@
 use crate::utils::geo_name;
-use anyhow::format_err;
 use cgmath::{Point3, Vector3};
 use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
 use fbxcel_dom::v7400::object::TypedObjectHandle;
 use fbxcel_dom::v7400::Document;
 use itertools::Itertools;
 use ordered_float::NotNan;
-use std::any::Any;
-use std::ops::Add;
 
 fn point_to_not_nan(p: Point3<f64>) -> anyhow::Result<Point3<NotNan<f64>>> {
     Ok(Point3::<NotNan<f64>>::new(
@@ -89,5 +86,5 @@ pub fn verify(doc: &Document) -> anyhow::Result<Option<String>> {
         }
     }
 
-    return Ok(None);
+    Ok(None)
 }

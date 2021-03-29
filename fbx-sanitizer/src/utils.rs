@@ -1,22 +1,17 @@
-use anyhow::format_err;
-use clap::App;
 use fbxcel_dom::fbxcel::low::v7400::AttributeValue;
 use fbxcel_dom::fbxcel::tree::v7400::NodeHandle;
 use fbxcel_dom::v7400::object::geometry::TypedGeometryHandle;
 use fbxcel_dom::v7400::object::model::TypedModelHandle;
-use fbxcel_dom::v7400::object::property::{PropertiesHandle, PropertiesNodeId};
 use fbxcel_dom::v7400::object::{ObjectId, TypedObjectHandle};
 use fbxcel_dom::v7400::Document;
 use std::collections::HashMap;
-use std::fmt;
-use std::fmt::{Display, Formatter};
 use std::fs::File;
 use std::io::BufWriter;
 use std::io::Write;
 
 /// Returns a useful name for a geometry. Either it's own given name, or the name of the first
 /// model that references this geometry.
-pub fn geo_name<'a, 'b>(geo: &TypedGeometryHandle<'a>) -> anyhow::Result<&'a str> {
+pub fn geo_name<'a>(geo: &TypedGeometryHandle<'a>) -> anyhow::Result<&'a str> {
     let model_parent = geo
         .destination_objects()
         .filter(|obj| obj.label().is_none())
@@ -89,6 +84,7 @@ pub fn print_children(
 
 /// Returns the Creator string from the document root, if it exists.
 /// Usually the FBX SDK (Maya, Max) or Blender
+#[allow(dead_code)]
 pub fn get_creator(doc: &Document) -> Option<&str> {
     let node = doc.tree().root().children_by_name("Creator").next()?;
 
@@ -102,7 +98,7 @@ pub fn get_creator(doc: &Document) -> Option<&str> {
 
 /// Returns the FBXHeaderExtension->SceneInfo->LastSaved|ApplicationName property, which is the
 /// name of the program that last saved the fbx file.
-/// 
+///
 /// Returns None if there is no application name provided in the file.
 pub fn get_application_name(doc: &Document) -> Option<ApplicationName> {
     let name = match doc.scene_info()?.get_property("LastSaved|ApplicationName") {
