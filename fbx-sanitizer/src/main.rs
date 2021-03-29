@@ -74,21 +74,27 @@ fn main() {
 
         let f_name = f_name.to_string_lossy().clone();
 
-        if f_name.ends_with(".fbx") {
+        if f_name.to_lowercase().ends_with(".fbx") {
             let result = check_fbx_file(&path.to_path_buf(), &cli_matches);
 
             if cli_matches.is_present("dump-structure") {}
 
             match result {
                 Err(e) => {
-                    log::error!("Could not parse fbx: {:?}", path);
-                    log::error!("{:?}", e);
+                    log::error!("Could not parse fbx: {}", path.display());
+                    log::error!("{}", e);
                     any_errs |= true;
                 }
                 Ok(success) => {
                     any_errs |= !success;
                 }
             }
+        } else {
+            log::error!("file [{}] does not have an .fbx extension.", path.display());
+            if !path.exists() {
+                log::error!("File [{}] does not exist.", path.display());
+            }
+            any_errs |= true;
         }
     }
 
