@@ -1,5 +1,5 @@
 [package]
-name = "fbx_sanity_checker"
+name = "fbx_sanitizer"
 version = "0.1.0"
 authors = ["John Austin <kleptine@gmail.com>"]
 edition = "2018"
@@ -20,6 +20,7 @@ lazy_static = "1.4.0"
 clap = "2.33.0"
 content_inspector = "0.2.4"
 indexmap = "1.6.2"
+assert_cmd = "1.0.3"
 
 [dependencies.cgmath]
 version = "0.18.0"
