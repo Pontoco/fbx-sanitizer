@@ -61,20 +61,15 @@ fn main() {
     let mut any_errs = false;
 
     for path in files {
-        let f_name_opt = path.file_name();
-
-        // File paths must have a sensible filename and extension
-        let f_name = match f_name_opt {
-            None => {
-                log::error!("File path was not a valid file path: {}", path.display());
-                continue;
-            }
-            Some(f) => f,
+        let extension = if let Some(ext) = path.extension() {
+            ext
+        } else {
+            log::error!("File path [{}] has no valid extension.", path.display());
+            any_errs |= true;
+            continue;
         };
 
-        let f_name = f_name.to_string_lossy().clone();
-
-        if f_name.to_lowercase().ends_with(".fbx") {
+        if extension.to_string_lossy().trim().to_lowercase() == "fbx" {
             let result = check_fbx_file(&path.to_path_buf(), &cli_matches);
 
             if cli_matches.is_present("dump-structure") {}
@@ -90,7 +85,11 @@ fn main() {
                 }
             }
         } else {
-            log::error!("file [{}] does not have an .fbx extension.", path.display());
+            log::error!(
+                "file [{}] does not have an .fbx extension. Extension: [{}]",
+                path.display(),
+                extension.to_string_lossy()
+            );
             if !path.exists() {
                 log::error!("File [{}] does not exist.", path.display());
             }
