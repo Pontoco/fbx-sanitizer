@@ -73,14 +73,13 @@ fn coordinate_axis_for_software(application_name: &Option<ApplicationName>) -> C
         },
 
         Some(ApplicationName::Blender) =>
-        // For Blender we must export in a flipped coordinate space so it imports correctly in Unity.
+        // For Blender we export with a 180 flip from Blender's normal coordinates to fix:
         // https://forum.unity.com/threads/bake-axis-conversion-import-setting.899072/#post-6975023
-        // This is the Unity coordinate space, but with y flipped
         {
             CoordinateAxis {
-                up: Vector3 { x: 0, y: 1, z: 0 },
-                front: Vector3 { x: 0, y: 0, z: 1 },
-                coord: Vector3 { x: 1, y: 0, z: 0 },
+                up: Vector3 { x: 0, y: 0, z: 1 },
+                front: Vector3 { x: 0, y: 1, z: 0 },
+                coord: Vector3 { x: -1, y: 0, z: 0 },
             }
         }
 
