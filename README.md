@@ -8,7 +8,7 @@ Supported platforms are Windows, Linux, and OSX.
 It is recommended to use this with the [Pontoco Unity Import/Export settings](https://www.notion.so/Pontoco-FBX-Import-Export-Settings-7b363beb7f7249f2bca6d6bdbcae6c5d), which provides export presets for all of the above modeling programs, and a Unity import preset. 
 
 ## Checks
-See `checks/` for a detailed like of checks and reasonings. In summary:
+See `checks/` for a detailed list of checks and reasonings. In summary:
  - **Identity Transform**: Verifies a single root object has an identity transform.
  - **Correct Coordinate Axis**: Verifies the file is saved with a coordinate axis that will result in a zero rotation. This is unique for each export program.
  - **Units In Meters**: Verifies the file is in Meters units. (ignored for Maya exports)
