@@ -5,7 +5,7 @@ FBX Santizer does not depend on the FBX SDK, and is a single static executable. 
 
 Supported platforms are Windows, Linux, and OSX.
 
-It is recommended to use this with the Pontoco Unity Import/Export settings, which provides export presets for all of the above modeling programs, and a Unity import preset. 
+It is recommended to use this with the [Pontoco Unity Import/Export settings](https://www.notion.so/Pontoco-FBX-Import-Export-Settings-7b363beb7f7249f2bca6d6bdbcae6c5d), which provides export presets for all of the above modeling programs, and a Unity import preset. 
 
 ## Checks
 See `checks/` for a detailed like of checks and reasonings. In summary:
