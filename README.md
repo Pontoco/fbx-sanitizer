@@ -1,5 +1,5 @@
 # FBX Sanitizer
-FBX Sanitizer is a single-exe CLI application to check FBX files for common issues such as scaling, rotation, mesh sizes, etc. Running this application on an FBX file verifies that the asset will import into Unity with unit scale and zero rotation.
+FBX Sanitizer is a single-exe CLI application to check FBX files for common issues such as scaling, rotation, and triangulation. Running this application on an FBX file verifies that the asset will import into Unity with unit scale and zero rotation.
 
 FBX Santizer does not depend on the FBX SDK, and is a single static executable. It is lightweight, incredibly fast, and can analyze hundreds of FBX files per second. FBX parsing is provided by the wonderful [fbxcel-dom](https://github.com/lo48576/fbxcel). The tool is designed to analyze exports from Blender, Maya, and 3DS Max, but should also support other programs.
 
