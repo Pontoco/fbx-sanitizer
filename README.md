@@ -43,3 +43,7 @@ Contributions are welcome!
 
 ## License
 FBX Sanitizer is licensed under the MIT license. But please consider contributing back up-stream if you make tweaks.
+
+## Additional Reading
+- http://uninomicon.com/fbx_importing
+- https://code.blender.org/2013/08/fbx-binary-file-format-specification/
