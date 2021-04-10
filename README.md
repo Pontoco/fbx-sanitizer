@@ -11,7 +11,7 @@ It is recommended to use this with the [Pontoco Unity Import/Export settings](ht
 See `checks/` for a detailed list of checks and reasonings. In summary:
  - **Identity Transform**: Verifies a single root object has an identity transform.
  - **Correct Coordinate Axis**: Verifies the file is saved with a coordinate axis that will result in a zero rotation. This is unique for each export program.
- - **Units In Meters**: Verifies the file is in Meters units. (ignored for Maya exports)
+ - **Units In Meters**: Verifies the file is in Meters units. ([ignored for Maya exports](http://uninomicon.com/fbx_importing#folded_1929534150840c69a4accdff7b5c8f75_2))
  - **No Quads**: Verifies there are no quads or ngons. Unity's will not triangulate a mesh in the same way that Substance Painter will.
  - **Contains Normals**: Verifies all meshes contain normals. Unity's 'calculate normals' is not great -- it's much better to use your modeling program.
  - **Is Binary**: Verifies the file is saved in the FBX Binary format. (Blender can't open ASCII files)
