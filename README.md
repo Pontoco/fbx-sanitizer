@@ -5,9 +5,11 @@ FBX Santizer does not depend on the FBX SDK, and is a single static executable. 
 
 Supported platforms are Windows, Linux, and OSX.
 
+It is recommended to use this with the Pontoco Unity Import/Export settings, which provides export presets for all of the above modeling programs, and a Unity import preset. 
+
 ## Checks
 See `checks/` for a detailed like of checks and reasonings. In summary:
- - **Identity Transform**: Verfifies a single root object has an identity transform.
+ - **Identity Transform**: Verifies a single root object has an identity transform.
  - **Correct Coordinate Axis**: Verifies the file is saved with a coordinate axis that will result in a zero rotation. This is unique for each export program.
  - **Units In Meters**: Verifies the file is in Meters units. (ignored for Maya exports)
  - **No Quads**: Verifies there are no quads or ngons. Unity's will not triangulate a mesh in the same way that Substance Painter will.
