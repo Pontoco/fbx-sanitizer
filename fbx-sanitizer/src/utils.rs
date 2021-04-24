@@ -118,6 +118,8 @@ pub fn get_application_name(doc: &Document) -> Option<ApplicationName> {
         Some(ApplicationName::Maya)
     } else if name.contains("3ds Max") {
         Some(ApplicationName::Max)
+    } else if name.contains("Houdini") {
+        Some(ApplicationName::Houdini)
     } else {
         Some(ApplicationName::UnknownApplication(name))
     }
@@ -128,5 +130,6 @@ pub enum ApplicationName<'a> {
     Blender, // blender
     Max,     // 3ds max
     Maya,    // maya
+    Houdini, // houdini
     UnknownApplication(&'a str),
 }
