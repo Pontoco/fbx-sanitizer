@@ -11,7 +11,7 @@ pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
     // Some tools like Max will output the correct transforms, with slight error, so we
     // check all of these using an epsilon.
     // However, we try to have as tight a bound as possible, so each epsilon is separate.
-    const ROT_EPSILON: f64 = 0.000000000001f64; // 3ds max
+    const ROT_EPSILON: f64 = 0.00001f64; // 3ds max
     const SCL_EPSILON: f64 = 0.000000000001f64; // 3ds max
     #[allow(dead_code)]
     const TRA_EPSILON: f64 = 0.000000000001f64; // 3ds max exports translates as small as this sometimes
