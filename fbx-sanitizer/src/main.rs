@@ -4,7 +4,7 @@ use indexmap::IndexMap;
 use std::fs::File;
 use std::io::Write;
 use std::io::{BufReader, BufWriter};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 mod checks;
 mod utils;
@@ -40,18 +40,6 @@ fn main() {
         .arg(Arg::with_name("files").multiple(true).takes_value(true).help("A set of fbx files to analyze.").required(true))
         .get_matches();
 
-    // let fbx_file = Path::new(
-    //     r"C:\Projects\Clockwork\CloningMain\Assets\Game\Environment\Gardening\Pots\Pot3.fbx",
-    // );
-    //
-
-    // let fbx_file = Path::new(r"C:\Projects\Clockwork\CloningMain\Assets");
-
-    // let directory_files = WalkDir::new(files)
-    //     .follow_links(true)
-    //     .into_iter()
-    //     .filter_map(|e| e.ok());
-
     let files: Vec<&Path> = cli_matches
         .values_of("files")
         .unwrap()
@@ -71,8 +59,6 @@ fn main() {
 
         if extension.to_string_lossy().trim().to_lowercase() == "fbx" {
             let result = check_fbx_file(&path.to_path_buf(), &cli_matches);
-
-            if cli_matches.is_present("dump-structure") {}
 
             match result {
                 Err(e) => {
@@ -104,7 +90,7 @@ fn main() {
 
 /// Runs checks on the fbx file at the specified path.
 /// Returns true if there were no errors.
-pub fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, anyhow::Error> {
+pub fn check_fbx_file(path: &Path, args: &clap::ArgMatches) -> Result<bool, anyhow::Error> {
     // println!("Parsing file: {}", path.display());
     let file = File::open(path)?;
 
@@ -137,10 +123,18 @@ pub fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, a
                     );
                 }
 
-                // Apply each error checker.
+                let mut is_highpoly: bool = false;
+                if let Some(name) = path.file_stem() {
+                    if let Ok(canonical_path) = path.canonicalize() {
+                        if name.to_string_lossy().ends_with("_HP")
+                            && canonical_path.to_string_lossy().contains("Raw~")
+                        {
+                            is_highpoly = true;
+                        }
+                    }
+                }
 
-                // Disabled for now. Maya has to output file that are not in Meters, in order to
-                // import into Unity without a scale.
+                // Apply each error checker.
                 errors
                     .entry("Units not in meters")
                     .or_insert(vec![])
@@ -161,21 +155,20 @@ pub fn check_fbx_file(path: &PathBuf, args: &clap::ArgMatches) -> Result<bool, a
                     .entry("No normals")
                     .or_insert(vec![])
                     .extend(meshes_have_normals::verify(&doc)?);
-                errors
-                    .entry("Contains quads")
-                    .or_insert(vec![])
-                    .extend(no_quads::verify(&doc)?);
+
+                // Skip quad checks on the High Poly meshes in Raw~. These don't need to be triangulated.
+                if !is_highpoly {
+                    errors
+                        .entry("Contains quads")
+                        .or_insert(vec![])
+                        .extend(no_quads::verify(&doc)?);
+                }
+
                 // Disabled for now, until we can find a better way to report warnings.
                 // errors
                 //     .entry("Bad mesh naming")
                 //     .or_insert(vec![])
                 //     .extend(mesh_naming::verify(&doc)?);
-
-                // This check is currently disabled. See documentation, unity does not support this path.
-                // errors
-                //     .entry("Incorrect Axis")
-                //     .or_insert(vec![])
-                //     .extend(blender_exports_have_correct_axis::verify(&doc)?);
             }
             _ => panic!("Got FBX document of unsupported version"),
         }
