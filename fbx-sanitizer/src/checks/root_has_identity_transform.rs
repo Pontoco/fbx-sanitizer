@@ -18,13 +18,13 @@ pub fn verify(doc: &Document) -> anyhow::Result<Vec<String>> {
 
     let mut errors = vec![];
 
-    let roots = get_model_roots(&doc);
+    let roots = get_model_roots(doc);
 
     // Only files with a single root model are considered for this check.
     if roots.len() != 1 {
         return Ok(errors);
     }
-    for root in get_model_roots(&doc) {
+    for root in get_model_roots(doc) {
         let name = root.name().unwrap_or("(object has no name)");
 
         // Note(john): Disabling translation check for now. It's not proved to be a big problem in Unity,
