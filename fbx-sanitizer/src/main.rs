@@ -33,6 +33,9 @@ fn main() {
         .arg(Arg::with_name("summary").long("summary").takes_value(false).help(
             "Outputs a one-line summary for each fbx file passed in, rather than all errors.",
         ))
+        .arg(Arg::with_name("include-valid").long("include-valid").takes_value(false).help(
+            "When in summary mode, will output a line for every valid FBX file, instead of just those with errors.",
+        ))
         .arg(Arg::with_name("dump-structure")
                  .long("dump-structure")
                  .takes_value(false)
@@ -176,13 +179,14 @@ pub fn check_fbx_file(path: &Path, args: &clap::ArgMatches) -> Result<bool, anyh
 
     // Print output
     let total_errors: usize = errors.iter().map(|(_, errors)| errors.len()).sum();
+    let include_valid = args.is_present("include-valid");
     if args.is_present("summary") {
         let issues = errors
             .iter()
             .filter(|(_issue, errors)| !errors.is_empty())
             .map(|(issue, _errors)| issue)
             .join(",");
-        if total_errors > 0 {
+        if total_errors > 0 || include_valid {
             log::error!("{},{},{}", path.display(), total_errors, issues);
         }
     } else if total_errors > 0 {
