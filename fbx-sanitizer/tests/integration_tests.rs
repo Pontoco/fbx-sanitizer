@@ -81,6 +81,7 @@ fn wrong_extension() {
     command.args(&[d]);
     command.assert().failure();
 }
+
 #[test]
 fn skip_highpoly_raw_files() {
     let mut command = Command::cargo_bin("fbx_sanitizer").unwrap();
@@ -88,4 +89,13 @@ fn skip_highpoly_raw_files() {
     d.push("tests/Raw~/testquad_HP.fbx");
     command.args(&[d]);
     command.assert().success();
+}
+
+#[test]
+fn scale_compensation_is_disabled() {
+    let mut command = Command::cargo_bin("fbx_sanitizer").unwrap();
+    let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    d.push("tests/maya_export_scale_compensation.fbx");
+    command.args(&[d]);
+    command.assert().failure();
 }

@@ -10,13 +10,14 @@ mod checks;
 mod utils;
 
 use crate::utils::print_children;
-use checks::bounding_box_size;
 use checks::correct_coordinate_axis;
 use checks::is_fbx_binary;
 use checks::meshes_have_normals;
 use checks::no_quads;
 use checks::root_has_identity_transform;
 use checks::units_are_in_meters;
+use checks::bounding_box_size;
+use checks::no_scale_compensation;
 use itertools::Itertools;
 
 fn main() {
@@ -158,6 +159,10 @@ pub fn check_fbx_file(path: &Path, args: &clap::ArgMatches) -> Result<bool, anyh
                     .entry("No normals")
                     .or_insert(vec![])
                     .extend(meshes_have_normals::verify(&doc)?);
+                errors
+                    .entry("Scaling compensation is enabled")
+                    .or_insert(vec![])
+                    .extend(no_scale_compensation::verify(&doc)?);
 
                 // Skip quad checks on the High Poly meshes in Raw~. These don't need to be triangulated.
                 if !is_highpoly {
