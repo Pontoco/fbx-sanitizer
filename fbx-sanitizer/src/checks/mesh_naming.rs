@@ -4,7 +4,6 @@ use lazy_static::lazy_static;
 use regex::Regex;
 
 // Invalid mesh names:
-#[allow(clippy::trivial_regex)]
 lazy_static! {
     static ref CUBE: Regex = Regex::new(r"^Cube\.\d+$").unwrap();
     static ref CYLINDER: Regex = Regex::new(r"^cylinder\d+$").unwrap();

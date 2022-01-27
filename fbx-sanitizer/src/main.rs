@@ -47,7 +47,7 @@ fn main() {
     let files: Vec<&Path> = cli_matches
         .values_of("files")
         .unwrap()
-        .map(|f| Path::new(f))
+        .map(Path::new)
         .collect();
 
     let mut any_errs = false;
@@ -56,13 +56,16 @@ fn main() {
         let extension = if let Some(ext) = path.extension() {
             ext
         } else {
-            log::error!("File path [{}] has no valid extension.", path.display());
+            log::error!(
+                "File path [{}] has no extension. It must be an .fbx file.",
+                path.display()
+            );
             any_errs |= true;
             continue;
         };
 
         if extension.to_string_lossy().trim().to_lowercase() == "fbx" {
-            let result = check_fbx_file(&path.to_path_buf(), &cli_matches);
+            let result = check_fbx_file(path, &cli_matches);
 
             match result {
                 Err(e) => {
