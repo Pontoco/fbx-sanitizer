@@ -16,6 +16,7 @@ See `checks/` for a detailed list of checks and reasonings. In summary:
  - **Contains Normals**: Verifies all meshes contain normals. Unity's 'calculate normals' is not great -- it's much better to use your modeling program.
  - **Is Binary**: Verifies the file is saved in the FBX Binary format. (Blender can't open ASCII files)
  - **Bounding Box**: Verifies any given mesh is not massive or tiny. This can cause "Generate Lightmap UVs" in Unity to fail.
+ - **No Scale Compensation**: Maya animations use Scale Compensation by default. Unity (or any other tool) doesn't support this attribute.
 
 ## Usage
 ```
