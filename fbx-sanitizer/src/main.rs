@@ -38,7 +38,7 @@ fn main() {
                  .takes_value(false)
                  .help("Writes a loosely yaml-structured version of the binary file to <file>_structure.yml. Suitable for debugging and inspection."), )
         .arg(Arg::with_name("files").multiple(true).takes_value(true).help("A set of fbx files to analyze.").required(true))
-        .get_matches();
+        .get_matches_from(wild::args());
 
     let files: Vec<&Path> = cli_matches
         .values_of("files")

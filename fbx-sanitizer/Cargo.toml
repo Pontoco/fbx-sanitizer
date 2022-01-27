@@ -21,6 +21,7 @@ clap = "2.33.0"
 content_inspector = "0.2.4"
 indexmap = "1.6.2"
 assert_cmd = "1.0.3"
+wild = "2.0.4"
 
 [dependencies.cgmath]
 version = "0.18.0"
