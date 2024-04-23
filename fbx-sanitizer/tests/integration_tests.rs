@@ -99,3 +99,12 @@ fn scale_compensation_is_disabled() {
     command.args(&[d]);
     command.assert().failure();
 }
+
+#[test]
+fn file_with_namespaces_fails() {
+    let mut command = Command::cargo_bin("fbx_sanitizer").unwrap();
+    let mut d = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    d.push("tests/maya_export_has_namespaces.fbx");
+    command.args(&[d]);
+    command.assert().failure();
+}

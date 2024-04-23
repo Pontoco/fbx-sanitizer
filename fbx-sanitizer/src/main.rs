@@ -19,6 +19,7 @@ use checks::units_are_in_meters;
 use checks::bounding_box_size;
 use checks::no_scale_compensation;
 use itertools::Itertools;
+use crate::checks::no_namespaces;
 
 fn main() {
     // Custom logging formatting: "[ERROR] Error text."
@@ -166,6 +167,10 @@ pub fn check_fbx_file(path: &Path, args: &clap::ArgMatches) -> Result<bool, anyh
                     .entry("Scaling compensation is enabled")
                     .or_insert(vec![])
                     .extend(no_scale_compensation::verify(&doc)?);
+                errors
+                    .entry("Objects should not have namespaces")
+                    .or_insert(vec![])
+                    .extend(no_namespaces::verify(&doc)?);
 
                 // Skip quad checks on the High Poly meshes in Raw~. These don't need to be triangulated.
                 if !is_highpoly {
