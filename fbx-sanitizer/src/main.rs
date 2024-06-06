@@ -156,10 +156,6 @@ pub fn check_fbx_file(path: &Path, args: &clap::ArgMatches) -> Result<bool, anyh
                     .or_insert(vec![])
                     .extend(root_has_identity_transform::verify(&doc)?);
                 errors
-                    .entry("Mesh size is wrong")
-                    .or_insert(vec![])
-                    .extend(bounding_box_size::verify(&doc)?);
-                errors
                     .entry("No normals")
                     .or_insert(vec![])
                     .extend(meshes_have_normals::verify(&doc)?);
@@ -171,6 +167,13 @@ pub fn check_fbx_file(path: &Path, args: &clap::ArgMatches) -> Result<bool, anyh
                     .entry("Objects should not have namespaces")
                     .or_insert(vec![])
                     .extend(no_namespaces::verify(&doc)?);
+
+                // Disabled checks:
+                // This is only necessary for light baking, which we no longer use.
+                // errors
+                //     .entry("Mesh size is wrong")
+                //     .or_insert(vec![])
+                //     .extend(bounding_box_size::verify(&doc)?);
 
                 // Skip quad checks on the High Poly meshes in Raw~. These don't need to be triangulated.
                 if !is_highpoly {
